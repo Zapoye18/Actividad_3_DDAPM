@@ -2,6 +2,7 @@ package com.example.actividad_2_ddapm
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -58,6 +60,8 @@ import com.example.actividad_2_ddapm.ui.theme.Actividad_2_DDAPMTheme
 import com.example.actividad_2_ddapm.ui.theme.Green2D0
 import com.example.actividad_2_ddapm.viewModel.CampusViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.actividad_2_ddapm.model.LoginResponse
+import com.example.actividad_2_ddapm.viewModel.LoginViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -242,9 +246,16 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(name: String, modifier: Modifier = Modifier, loginViewModel: LoginViewModel = viewModel<LoginViewModel>()) {
+    val context = LocalContext.current
     var correo by remember { mutableStateOf("") }
     var contraseña by remember { mutableStateOf("") }
+    val loginResponseState by loginViewModel.login(correo, contraseña).observeAsState()
+
+    // Estado para controlar cuando mostrar el Toast
+    var toastShown by remember { mutableStateOf(false) }
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth().padding(16.dp)
@@ -287,7 +298,10 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 label = { Text("Contraseña") }
             )
             Button(
-                onClick = {},
+                onClick = {
+                    toastShown = true // Reiniciamos para que pueda mostrar Toast
+                    loginViewModel.login(correo, contraseña)
+                },
                 modifier = Modifier
                     .fillMaxWidth().padding(60.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -296,6 +310,26 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(text = "Entrar")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            loginResponseState?.let { response ->
+                if (toastShown) {
+                    val user = response.d?.users?.firstOrNull()
+                    if (user != null) {
+                        Toast.makeText(context, "Bienvenido ${user.name} ${user.lastName}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
+                    }
+                    toastShown = false
+                }
+
+//                // Mostrar datos si hay usuario
+//                response.d?.users?.firstOrNull()?.let { user ->
+//                    Text("Nombre: ${user.name} ${user.lastName}")
+//                    Text("Correo: ${user.email}")
+//                    Text("Campus: ${user.campus}")
+//                }
             }
         }
     }

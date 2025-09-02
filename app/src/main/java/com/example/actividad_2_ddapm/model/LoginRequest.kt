@@ -3,12 +3,12 @@ import com.google.gson.annotations.SerializedName
 
 
 data class LoginRequest(
-    @SerializedName("datos") val datos: LoginDatos
+    @SerializedName("LoginData") val loginData: LoginDatos
 )
 
 data class LoginDatos(
     @SerializedName("Email") val email: String,
-    @SerializedName("Password") val password: String,
+    @SerializedName("Password") val password: String
 )
 
 

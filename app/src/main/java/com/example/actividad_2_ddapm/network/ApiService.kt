@@ -15,7 +15,7 @@ interface ApiService {
     @GET("campus.aspx")
     suspend fun getCampusNames(): CampusesResponse
 
-    @POST("UserLogin")
+    @POST("users.aspx/UserLogin")
     suspend fun postLoginRequests(@Body request: LoginRequest): LoginResponse
 
 }

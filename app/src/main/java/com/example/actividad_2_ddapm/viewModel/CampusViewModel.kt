@@ -11,6 +11,8 @@ import com.example.actividad_2_ddapm.network.RetrofitClient
 import com.example.actividad_2_ddapm.model.Campuses
 import com.example.actividad_2_ddapm.model.LoginDatos
 import com.example.actividad_2_ddapm.model.LoginRequest
+import com.example.actividad_2_ddapm.model.NewUserDatos
+import com.example.actividad_2_ddapm.model.NewUserRequest
 import kotlinx.coroutines.Dispatchers
 
 class CampusViewModel : ViewModel() {
@@ -41,6 +43,27 @@ class LoginViewModel : ViewModel() {
 
             // Hacemos la llamada al API
             val response = RetrofitClient.instance.postLoginRequests(request)
+            //Log.d("API_RESPONSE", response.toString())
+
+            emit(response)
+        } catch (e: Exception) {
+            //Log.e("API_ERROR", e.toString())
+            emit(null) // En caso de error
+        }
+    }
+}
+
+class NewUserViewModel : ViewModel() {
+
+    fun Register(campusID: Int, email1: String, nombre: String, apellido: String, matricula: Int, contraseña: String) = liveData(Dispatchers.IO) {
+        try {
+            val NewUserRequest2 = NewUserDatos(nombre, apellido, email1, contraseña, matricula, campusID)
+            val request = NewUserRequest(NewUserRequest2)
+            //Log.d("LoginViewModel", "Haciendo login con $username / $password")
+
+
+            // Hacemos la llamada al API
+            val response = RetrofitClient.instance.postNewUserRequest(request)
             //Log.d("API_RESPONSE", response.toString())
 
             emit(response)

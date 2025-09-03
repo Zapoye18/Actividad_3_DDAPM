@@ -62,6 +62,7 @@ import com.example.actividad_2_ddapm.viewModel.CampusViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.actividad_2_ddapm.model.LoginResponse
 import com.example.actividad_2_ddapm.viewModel.LoginViewModel
+import com.example.actividad_2_ddapm.viewModel.NewUserViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -87,6 +88,8 @@ class MainActivity : ComponentActivity() {
                 val campuses by campusViewModel.campuses
                 var isLoading by remember { mutableStateOf(true) }
                 val scope = rememberCoroutineScope()
+                var idCampus: Int = 0
+                val newUserViewModel: NewUserViewModel = viewModel()
 
 
                 LaunchedEffect(Unit) {
@@ -169,6 +172,8 @@ class MainActivity : ComponentActivity() {
                                                             text = { Text(campusOption.campusName) },
                                                             onClick = {
                                                                 campus = campusOption.campusName
+                                                                idCampus = campusOption.campusID
+                                                                //Log.d("LoginViewModel", "Haciendo login con $idCampus")
                                                                 expanded = false
                                                             }
                                                         )
@@ -224,7 +229,30 @@ class MainActivity : ComponentActivity() {
                                             }
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Button(
-                                                onClick = {mostrar = false},
+                                                onClick = {mostrar = false
+                                                    newUserViewModel.Register(
+                                                        campusID = idCampus,
+                                                        email1 = email,
+                                                        nombre = nombre,
+                                                        apellido = apellido,
+                                                        matricula = matricula.toIntOrNull() ?: 0,
+                                                        contraseña = contraseña
+                                                    ).observe(this@MainActivity) { response ->
+                                                        if (response != null) {
+                                                            Toast.makeText(
+                                                                this@MainActivity,
+                                                                "Usuario creado: ${response?.d?.executeResult}",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                            Log.d("Mensaje de error", "ERROR: ${response?.d?.message}")
+                                                        } else {
+                                                            Toast.makeText(
+                                                                this@MainActivity,
+                                                                "Error: ${response?.d?.message}",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                        }
+                                                    }},
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = Color(0xFF00A499),
                                                     contentColor = Color(0xFFFFFFFF)

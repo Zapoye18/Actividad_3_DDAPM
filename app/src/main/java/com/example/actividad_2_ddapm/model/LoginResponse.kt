@@ -16,6 +16,6 @@ data class UserLogged(
     @SerializedName("Email") val email: String,
     @SerializedName("StudentNumber") val studentNumber: Int,
     @SerializedName("CampusID") val campusId: Int,
-    @SerializedName("Campus") val campus: String
+    @SerializedName("CampusName") val campus: String
 )
 

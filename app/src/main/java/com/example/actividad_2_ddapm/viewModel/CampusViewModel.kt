@@ -6,11 +6,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.example.actividad_2_ddapm.network.RetrofitClient
 import com.example.actividad_2_ddapm.model.Campuses
 import com.example.actividad_2_ddapm.model.LoginDatos
 import com.example.actividad_2_ddapm.model.LoginRequest
+import com.example.actividad_2_ddapm.model.LoginResponse
 import com.example.actividad_2_ddapm.model.NewUserDatos
 import com.example.actividad_2_ddapm.model.NewUserRequest
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +37,9 @@ class CampusViewModel : ViewModel() {
 
 class LoginViewModel : ViewModel() {
 
+    private val _loginResponse = MutableLiveData<LoginResponse?>()
+    val loginResponse: LiveData<LoginResponse?> = _loginResponse
+
     fun login(username: String, password: String) = liveData(Dispatchers.IO) {
         try {
             val loginDatos2 = LoginDatos(username, password)
@@ -45,6 +51,7 @@ class LoginViewModel : ViewModel() {
             val response = RetrofitClient.instance.postLoginRequests(request)
             //Log.d("API_RESPONSE", response.toString())
 
+            _loginResponse.postValue(response)
             emit(response)
         } catch (e: Exception) {
             //Log.e("API_ERROR", e.toString())

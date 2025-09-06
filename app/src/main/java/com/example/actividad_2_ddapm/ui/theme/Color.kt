@@ -17,3 +17,5 @@ val GreenStrong = Color(color = 0xFF00514A)
 val Lima = Color(color = 0xFF00A499)
 
 val white = Color(color = 0xFFFFFFFF)
+
+val Black = Color(color = 0xFF000000)

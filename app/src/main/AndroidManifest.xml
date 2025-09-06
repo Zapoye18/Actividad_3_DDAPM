@@ -15,6 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Actividad_2_DDAPM">
         <activity
+            android:name=".MainActivityMyInfo"/>
+        <activity
+            android:name=".MainActivityMyFriends"/>
+        <activity
+            android:name=".MainActivitySecondScreen"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

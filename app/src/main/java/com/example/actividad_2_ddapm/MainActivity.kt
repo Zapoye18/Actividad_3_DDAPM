@@ -1,5 +1,6 @@
 package com.example.actividad_2_ddapm
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -56,6 +57,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.MutableLiveData
 import com.example.actividad_2_ddapm.ui.theme.Actividad_2_DDAPMTheme
 import com.example.actividad_2_ddapm.ui.theme.Green2D0
 import com.example.actividad_2_ddapm.viewModel.CampusViewModel
@@ -276,9 +279,21 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier, loginViewModel: LoginViewModel = viewModel<LoginViewModel>()) {
     val context = LocalContext.current
+    val activity = context as? ComponentActivity
     var correo by remember { mutableStateOf("") }
     var contraseña by remember { mutableStateOf("") }
-    val loginResponseState by loginViewModel.login(correo, contraseña).observeAsState()
+    var doLogin by remember { mutableStateOf(false) }
+
+    // Siempre tener un LiveData válido
+    val loginLiveData = remember(doLogin, correo, contraseña) {
+        if (doLogin) {
+            loginViewModel.login(correo, contraseña)
+        } else {
+            MutableLiveData<LoginResponse?>(null) // <-- nunca null directamente
+        }
+    }
+
+    val loginResponseState by loginLiveData.observeAsState()
 
     // Estado para controlar cuando mostrar el Toast
     var toastShown by remember { mutableStateOf(false) }
@@ -327,8 +342,12 @@ fun Greeting(name: String, modifier: Modifier = Modifier, loginViewModel: LoginV
             )
             Button(
                 onClick = {
-                    toastShown = true // Reiniciamos para que pueda mostrar Toast
-                    loginViewModel.login(correo, contraseña)
+                    if (correo.isBlank() || contraseña.isBlank()) {
+                        Toast.makeText(context, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show()
+                    } else {
+                        doLogin = true
+                        toastShown = true
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth().padding(60.dp),
@@ -346,6 +365,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier, loginViewModel: LoginV
                     val user = response.d?.users?.firstOrNull()
                     if (user != null) {
                         Toast.makeText(context, "Bienvenido ${user.name} ${user.lastName}", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(context, MainActivitySecondScreen::class.java)
+                        intent.putExtra("name", user.name)
+                        intent.putExtra("lastName", user.lastName)
+                        context.startActivity(intent)
+                        activity?.finish()
                     } else {
                         Toast.makeText(context, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                     }

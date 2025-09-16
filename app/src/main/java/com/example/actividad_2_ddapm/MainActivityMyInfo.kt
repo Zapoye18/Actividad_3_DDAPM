@@ -42,6 +42,7 @@ class MainActivityMyInfo : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("name") ?: "Desconocido"
+        val studentId = intent.getIntExtra("studentId", -1)
         val lastName = intent.getStringExtra("lastName") ?: ""
         enableEdgeToEdge()
         setContent {
@@ -75,6 +76,7 @@ class MainActivityMyInfo : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivitySecondScreen::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }
@@ -85,6 +87,7 @@ class MainActivityMyInfo : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivityMyFriends::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }
@@ -95,6 +98,7 @@ class MainActivityMyInfo : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivityMyInfo::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }

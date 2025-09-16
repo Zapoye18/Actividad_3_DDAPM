@@ -367,6 +367,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier, loginViewModel: LoginV
                         Toast.makeText(context, "Bienvenido ${user.name} ${user.lastName}", Toast.LENGTH_SHORT).show()
                         val intent = Intent(context, MainActivitySecondScreen::class.java)
                         intent.putExtra("name", user.name)
+                        intent.putExtra("studentId", user.userId)
                         intent.putExtra("lastName", user.lastName)
                         context.startActivity(intent)
                         activity?.finish()

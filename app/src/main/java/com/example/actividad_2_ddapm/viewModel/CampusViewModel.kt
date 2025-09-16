@@ -11,6 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.example.actividad_2_ddapm.network.RetrofitClient
 import com.example.actividad_2_ddapm.model.Campuses
+import com.example.actividad_2_ddapm.model.FriendsFilterData
+import com.example.actividad_2_ddapm.model.FriendsFilterRequest
+import com.example.actividad_2_ddapm.model.FriendsFilterResponse
 import com.example.actividad_2_ddapm.model.LoginDatos
 import com.example.actividad_2_ddapm.model.LoginRequest
 import com.example.actividad_2_ddapm.model.LoginResponse
@@ -74,6 +77,33 @@ class NewUserViewModel : ViewModel() {
             //Log.d("API_RESPONSE", response.toString())
 
             emit(response)
+        } catch (e: Exception) {
+            //Log.e("API_ERROR", e.toString())
+            emit(null) // En caso de error
+        }
+    }
+}
+
+class FriendsFilterViewModel : ViewModel() {
+
+    private val _FriendsFilterResponse = MutableLiveData<FriendsFilterResponse?>()
+    val FriendsFilterResponse: LiveData<FriendsFilterResponse?> get()= _FriendsFilterResponse
+
+    fun Search(loggedUserId: Int, campusId: Int, name: String) = liveData(Dispatchers.IO) {
+        Log.d("VIEWMODEL_SEARCH", "Search called")
+        try {
+            val FriendsFilterData = FriendsFilterData(loggedUserId, campusId, name)
+            val request = FriendsFilterRequest(FriendsFilterData)
+            //Log.d("LoginViewModel", "Haciendo login con $username / $password")
+
+
+            // Hacemos la llamada al API
+            val response = RetrofitClient.instance.postNewFriendsFilterRequest(request)
+            Log.d("API_RESPONSE", response.toString())
+            //Log.d("API_RESPONSE", response.toString())
+
+            emit(response)
+            _FriendsFilterResponse.postValue(response)
         } catch (e: Exception) {
             //Log.e("API_ERROR", e.toString())
             emit(null) // En caso de error

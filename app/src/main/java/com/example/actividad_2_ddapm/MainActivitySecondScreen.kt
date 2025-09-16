@@ -74,6 +74,7 @@ class MainActivitySecondScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("name") ?: "Desconocido"
         val lastName = intent.getStringExtra("lastName") ?: ""
+        val studentId = intent.getIntExtra("studentId", -1)
         enableEdgeToEdge()
         setContent {
             Actividad_2_DDAPMTheme {
@@ -106,6 +107,7 @@ class MainActivitySecondScreen : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivitySecondScreen::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }
@@ -116,6 +118,7 @@ class MainActivitySecondScreen : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivityMyFriends::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }
@@ -126,6 +129,7 @@ class MainActivitySecondScreen : ComponentActivity() {
                                             expanded = false
                                             val intent = Intent(context, MainActivityMyInfo::class.java)
                                             intent.putExtra("name", name)
+                                            intent.putExtra("studentId", studentId)
                                             intent.putExtra("lastName", lastName)
                                             context.startActivity(intent)
                                         }
@@ -160,6 +164,7 @@ class MainActivitySecondScreen : ComponentActivity() {
                         Greeting2(
                             name = name,
                             lastname = lastName,
+                            studentId = studentId,
                             modifier = Modifier.padding(innerPadding),
                         )
                     }
@@ -171,7 +176,7 @@ class MainActivitySecondScreen : ComponentActivity() {
 
 
 @Composable
-fun Greeting2(name: String, lastname: String, modifier: Modifier = Modifier) {
+fun Greeting2(name: String, lastname: String, studentId: Int,  modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -186,7 +191,7 @@ fun Greeting2(name: String, lastname: String, modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Bienvenido $name $lastname",
+            text = "Bienvenido $name $lastname $studentId",
             fontSize = 20.sp
         )
     }
@@ -196,6 +201,6 @@ fun Greeting2(name: String, lastname: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview2() {
     Actividad_2_DDAPMTheme {
-        Greeting2("Agustin","Villanueva")
+        Greeting2("Agustin","Villanueva", 1)
     }
 }

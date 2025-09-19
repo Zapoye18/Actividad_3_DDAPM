@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -14,6 +15,8 @@ import com.example.actividad_2_ddapm.model.Campuses
 import com.example.actividad_2_ddapm.model.FriendsFilterData
 import com.example.actividad_2_ddapm.model.FriendsFilterRequest
 import com.example.actividad_2_ddapm.model.FriendsFilterResponse
+import com.example.actividad_2_ddapm.model.FriendsListDatos
+import com.example.actividad_2_ddapm.model.FriendsListRequest
 import com.example.actividad_2_ddapm.model.LoginDatos
 import com.example.actividad_2_ddapm.model.LoginRequest
 import com.example.actividad_2_ddapm.model.LoginResponse
@@ -110,3 +113,37 @@ class FriendsFilterViewModel : ViewModel() {
         }
     }
 }
+
+class FriendsViewModel : ViewModel() {
+
+    // Lista reactiva de IDs seleccionados
+    private val _selectedFriends = mutableStateListOf<Int>()
+    val selectedFriends: List<Int> get() = _selectedFriends
+
+    fun toggleFriendSelection(userId: Int, isSelected: Boolean) {
+        if (isSelected) {
+            if (!_selectedFriends.contains(userId)) {
+                _selectedFriends.add(userId)
+            }
+        } else {
+            _selectedFriends.remove(userId)
+        }
+        Log.d("FriendsViewModel", "Seleccionados: ${getFriendsAsString()}")
+    }
+
+    fun getFriendsAsString(): String {
+        return _selectedFriends.joinToString(",")
+    }
+
+    fun sendFriends(studentId: Int) = liveData(Dispatchers.IO) {
+        try {
+            val friendsListDatos = FriendsListDatos(studentId, getFriendsAsString())
+            val request = FriendsListRequest(friendsListDatos)
+            val response = RetrofitClient.instance.postNewFriendsListRequest(request)
+            emit(response)
+        } catch (e: Exception) {
+            emit(null)
+        }
+    }
+}
+

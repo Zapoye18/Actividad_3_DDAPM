@@ -70,6 +70,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.actividad_2_ddapm.model.FriendsFilterResponse
 import com.example.actividad_2_ddapm.model.LoginResponse
 import com.example.actividad_2_ddapm.viewModel.FriendsFilterViewModel
+import com.example.actividad_2_ddapm.viewModel.FriendsViewModel
 import com.example.actividad_2_ddapm.viewModel.LoginViewModel
 
 class MainActivityMyFriends : ComponentActivity() {
@@ -189,15 +190,22 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
     var nombre by remember { mutableStateOf("") }
     //var buscar by remember { mutableStateOf(false) }
     var doFilter by remember { mutableStateOf(false) }
-    //var personas by remember { mutableStateOf(0) }
+    var totaldepersonas by remember { mutableStateOf(0) }
+    var totaldeamigos by remember { mutableStateOf(0) }
+    val friendsViewModel: FriendsViewModel = viewModel()
+    val sendResponse by friendsViewModel.sendFriends(studentId).observeAsState()
+    val context = LocalContext.current
+    var mostrarConteo by remember { mutableStateOf(true) }
+    var nombreSearch by remember { mutableStateOf("") }
+    var idCampusSearch by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         campusViewModel.loadCampuses()
     }
 
-    val filterLiveData = remember(doFilter, studentId, idCampus,nombre) {
+    val filterLiveData = remember(doFilter, studentId, idCampusSearch,nombreSearch) {
         if (doFilter) {
-            FriendsFilterViewModel.Search(studentId, idCampus, nombre)
+            FriendsFilterViewModel.Search(studentId, idCampusSearch, nombreSearch)
 
         } else {
             MutableLiveData<FriendsFilterResponse?>(null) // <-- nunca null directamente
@@ -278,11 +286,16 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
             }
             //Text(text = "hola")
             IconButton(onClick = {
-                doFilter = !doFilter
-                if(doFilter == false){
-                    nombre = ""
-                    campus = ""
-                }
+                doFilter = true
+                nombreSearch = nombre
+                idCampusSearch = idCampus
+//                if(doFilter == false){
+//                    nombre = ""
+//                    campus = ""
+//                    mostrarConteo = false
+//                }else{
+//                    mostrarConteo = true
+//                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Search,
@@ -301,15 +314,24 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ){
             Text(
-                text = "Por implemetar...",
+                text = "Amigos $totaldeamigos de $totaldepersonas",
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier.padding(12.dp))
             Button(
-                onClick = {},
+                onClick = {
+                    friendsViewModel.sendFriends(studentId)
+                    sendResponse?.let { response ->
+                        if(response != null){
+                            Toast.makeText(context, "Status de amigos guardados: ${response.d.executeResult} , ${response.d.message}", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(context, "Error: ${response.d.executeResult} , ${response.d.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
                 shape = RectangleShape,
                         modifier = Modifier
-                    .fillMaxWidth().padding(60.dp),
+                    .fillMaxWidth().padding(55.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF00514A),
                     contentColor = Color(0xFFFFFFFF)
@@ -320,6 +342,12 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
         }
         filterResponseState?.let { response ->
             val friends = response.d.friends
+            val existingFriends = filterResponseState?.d?.friends
+            existingFriends?.forEach { friend ->
+                if(friend.isFriend.toBoolean()) {
+                    friendsViewModel.toggleFriendSelection(friend.userId, true)
+                }
+            }
             friends.forEach { friendOption ->
                 val initialChecked = friendOption.isFriend.toBoolean()
 
@@ -336,13 +364,28 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
                 ){
                     Checkbox(
                         checked = isChecked,
-                        onCheckedChange = { isChecked = it },
+                        onCheckedChange = { checked ->
+                            isChecked = checked
+                            friendsViewModel.toggleFriendSelection(friendOption.userId, checked)
+                        },
                         modifier = Modifier.size(40.dp)
                     )
                     Column {
                         Text(text = "Nombre: ${friendOption.completeName}")
                         Text(text = "Matrícula: ${friendOption.studentNumber}")
                         Text(text = "Campus: ${friendOption.campus}")
+                        Text(text = "Es Amigo?: ${friendOption.isFriend}")
+                        friendOption.userId
+                        totaldepersonas = if(mostrarConteo){
+                            filterResponseState?.d?.friends?.size ?: 0
+                        }else{
+                            0
+                        }
+                        totaldeamigos = if(mostrarConteo){
+                            filterResponseState?.d?.friends?.count { it.isFriend.toBoolean() } ?: 0
+                        }else{
+                            0
+                        }
                         //personas = personas + 1
                         Spacer(modifier = Modifier.height(8.dp))
                     }

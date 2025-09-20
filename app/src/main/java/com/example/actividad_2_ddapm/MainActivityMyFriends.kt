@@ -342,17 +342,22 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
         }
         filterResponseState?.let { response ->
             val friends = response.d.friends
-            val existingFriends = filterResponseState?.d?.friends
-            existingFriends?.forEach { friend ->
-                if(friend.isFriend.toBoolean()) {
-                    friendsViewModel.toggleFriendSelection(friend.userId, true)
-                }
-            }
+//            val existingFriends = filterResponseState?.d?.friends
+//            existingFriends?.forEach { friend ->
+//                if(friend.isFriend.toBoolean()) {
+//                    friendsViewModel.toggleFriendSelection(friend.userId, true)
+//                }
+//            }
             friends.forEach { friendOption ->
                 val initialChecked = friendOption.isFriend.toBoolean()
 
                 var isChecked by remember(friendOption.studentNumber) {
                     mutableStateOf(initialChecked)
+                }
+                if(isChecked) {
+                    friendsViewModel.toggleFriendSelection(friendOption.userId, true)
+                }else{
+                    friendsViewModel.toggleFriendSelection(friendOption.userId, false)
                 }
                 Row(
                     modifier = Modifier

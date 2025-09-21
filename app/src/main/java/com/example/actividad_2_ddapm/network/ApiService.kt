@@ -16,6 +16,10 @@ import com.example.actividad_2_ddapm.model.LoginRequest
 import com.example.actividad_2_ddapm.model.LoginResponse
 import com.example.actividad_2_ddapm.model.NewUserRequest
 import com.example.actividad_2_ddapm.model.NewUserResponse
+import com.example.actividad_2_ddapm.model.PostFilterRequest
+import com.example.actividad_2_ddapm.model.PostFilterResponse
+import com.example.actividad_2_ddapm.model.PostRequest
+import com.example.actividad_2_ddapm.model.PostResponse
 import okhttp3.Response
 
 interface ApiService {
@@ -33,4 +37,10 @@ interface ApiService {
 
     @POST("users.aspx/FriendsUI")
     suspend fun postNewFriendsListRequest(@Body request: FriendsListRequest): FriendsListResponse
+
+    @POST("posts.aspx/Posts")
+    suspend fun newPostFilterRequest(@Body request: PostFilterRequest): PostFilterResponse
+
+    @POST("posts.aspx/PostsUI")
+    suspend fun newPostRequest(@Body request: PostRequest): PostResponse
 }

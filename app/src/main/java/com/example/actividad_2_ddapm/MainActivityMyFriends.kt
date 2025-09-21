@@ -189,7 +189,7 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
     val campuses by campusViewModel.campuses
     var nombre by remember { mutableStateOf("") }
     //var buscar by remember { mutableStateOf(false) }
-    var doFilter by remember { mutableStateOf(false) }
+    var doFilter by remember { mutableStateOf(true) }
     var totaldepersonas by remember { mutableStateOf(0) }
     var totaldeamigos by remember { mutableStateOf(0) }
     val friendsViewModel: FriendsViewModel = viewModel()
@@ -286,7 +286,6 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
             }
             //Text(text = "hola")
             IconButton(onClick = {
-                doFilter = true
                 nombreSearch = nombre
                 idCampusSearch = idCampus
 //                if(doFilter == false){
@@ -326,6 +325,7 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
                             Toast.makeText(context, "Status de amigos guardados: ${response.d.executeResult} , ${response.d.message}", Toast.LENGTH_SHORT).show()
                         }else{
                             Toast.makeText(context, "Error: ${response.d.executeResult} , ${response.d.message}", Toast.LENGTH_SHORT).show()
+                            //Log.e("API_ERROR", e.toString())
                         }
                     }
                 },
@@ -350,15 +350,14 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
 //            }
             friends.forEach { friendOption ->
                 val initialChecked = friendOption.isFriend.toBoolean()
+                var isChecked by remember(friendOption.userId) { mutableStateOf(initialChecked) }
 
-                var isChecked by remember(friendOption.studentNumber) {
-                    mutableStateOf(initialChecked)
-                }
-                if(isChecked) {
+                if (isChecked) {
                     friendsViewModel.toggleFriendSelection(friendOption.userId, true)
-                }else{
+                } else {
                     friendsViewModel.toggleFriendSelection(friendOption.userId, false)
                 }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -371,6 +370,7 @@ fun Greeting3(name: String, studentId: Int,  modifier: Modifier = Modifier, Frie
                         checked = isChecked,
                         onCheckedChange = { checked ->
                             isChecked = checked
+                            Log.d("FriendRow", "toggle id=${friendOption.userId} -> $checked")
                             friendsViewModel.toggleFriendSelection(friendOption.userId, checked)
                         },
                         modifier = Modifier.size(40.dp)

@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.example.actividad_2_ddapm.network.RetrofitClient
 import com.example.actividad_2_ddapm.model.Campuses
+import com.example.actividad_2_ddapm.model.Friend
 import com.example.actividad_2_ddapm.model.FriendsFilterData
 import com.example.actividad_2_ddapm.model.FriendsFilterRequest
 import com.example.actividad_2_ddapm.model.FriendsFilterResponse
@@ -22,6 +23,12 @@ import com.example.actividad_2_ddapm.model.LoginRequest
 import com.example.actividad_2_ddapm.model.LoginResponse
 import com.example.actividad_2_ddapm.model.NewUserDatos
 import com.example.actividad_2_ddapm.model.NewUserRequest
+import com.example.actividad_2_ddapm.model.PostData
+import com.example.actividad_2_ddapm.model.PostFilterData
+import com.example.actividad_2_ddapm.model.PostFilterRequest
+import com.example.actividad_2_ddapm.model.PostFilterResponse
+import com.example.actividad_2_ddapm.model.PostRequest
+import com.example.actividad_2_ddapm.model.PostResponse
 import kotlinx.coroutines.Dispatchers
 
 class CampusViewModel : ViewModel() {
@@ -116,9 +123,14 @@ class FriendsFilterViewModel : ViewModel() {
 
 class FriendsViewModel : ViewModel() {
 
-    // Lista reactiva de IDs seleccionados
     private val _selectedFriends = mutableStateListOf<Int>()
     val selectedFriends: List<Int> get() = _selectedFriends
+
+    fun setInitialFriends(friends: List<Friend>) {
+        _selectedFriends.clear()
+        _selectedFriends.addAll(friends.filter { it.isFriend.toBoolean() }.map { it.userId })
+    }
+
 
     fun toggleFriendSelection(userId: Int, isSelected: Boolean) {
         if (isSelected) {
@@ -147,3 +159,56 @@ class FriendsViewModel : ViewModel() {
     }
 }
 
+class PostFilterViewModel : ViewModel() {
+
+    private val _PostFilterResponse = MutableLiveData<PostFilterResponse?>()
+    val PostFilterResponse: LiveData<PostFilterResponse?> get()= _PostFilterResponse
+
+    fun PostsRequest(loggedUserId: Int) = liveData(Dispatchers.IO) {
+        Log.d("VIEWMODEL_SEARCH", "Search called")
+        try {
+            val PostFilterRequest = PostFilterData(loggedUserId)
+            val request = PostFilterRequest(PostFilterRequest)
+            //Log.d("LoginViewModel", "Haciendo login con $username / $password")
+
+
+            // Hacemos la llamada al API
+            val response = RetrofitClient.instance.newPostFilterRequest(request)
+            Log.d("API_RESPONSE", response.toString())
+            //Log.d("API_RESPONSE", response.toString())
+
+            emit(response)
+            _PostFilterResponse.postValue(response)
+        } catch (e: Exception) {
+            //Log.e("API_ERROR", e.toString())
+            emit(null) // En caso de error
+        }
+    }
+}
+
+class PostViewModel : ViewModel() {
+
+    private val _PostResponse = MutableLiveData<PostResponse?>()
+    val PostResponse: LiveData<PostResponse?> get()= _PostResponse
+
+    fun MyPostRequest(loggedUserId: Int, message1: String) = liveData(Dispatchers.IO) {
+        Log.d("VIEWMODEL_SEARCH", "Search called")
+        try {
+            val PostRequest = PostData(loggedUserId, message1)
+            val request = PostRequest(PostRequest)
+            //Log.d("LoginViewModel", "Haciendo login con $username / $password")
+
+
+            // Hacemos la llamada al API
+            val response = RetrofitClient.instance.newPostRequest(request)
+            Log.d("API_RESPONSE", response.toString())
+            //Log.d("API_RESPONSE", response.toString())
+
+            emit(response)
+//            _PostResponse.postValue(response)
+        } catch (e: Exception) {
+            //Log.e("API_ERROR", e.toString())
+            emit(null) // En caso de error
+        }
+    }
+}

@@ -251,25 +251,34 @@ fun Popup(mostrar: Boolean, onDismiss:() -> Unit, postMessage: String, studentId
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {onDismiss()
-                                      postViewModel.MyPostRequest(
-                                          loggedUserId = studentId,
-                                          message1 = postMessage
-                                      ).observe(lifecycleOwner) { response ->
-                                          if (response != null) {
-                                              Toast.makeText(
-                                                  context,
-                                                  "Post status: ${response?.d?.executeResult}",
-                                                  Toast.LENGTH_LONG
-                                              ).show()
-                                              Log.d("Mensaje de error del post", "ERROR: ${response?.d?.message}")
-                                          } else {
-                                              Toast.makeText(
-                                                  context,
-                                                  "Error: ${response?.d?.message}",
-                                                  Toast.LENGTH_LONG
-                                              ).show()
-                                          }
-                                      }},
+                                if(postMessage.isNotBlank()){
+                                    postViewModel.MyPostRequest(
+                                        loggedUserId = studentId,
+                                        message1 = postMessage
+                                    ).observe(lifecycleOwner) { response ->
+                                        if (response != null) {
+                                            Toast.makeText(
+                                                context,
+                                                "Post status: ${response?.d?.executeResult}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            Log.d("Mensaje de error del post", "ERROR: ${response?.d?.message}")
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Error: ${response?.d?.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
+                                }else{
+                                    Toast.makeText(
+                                        context,
+                                        "Ingresa un post antes de publicar",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                                      },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF00A499),
                                 contentColor = Color(0xFFFFFFFF)
